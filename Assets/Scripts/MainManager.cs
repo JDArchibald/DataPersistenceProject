@@ -13,6 +13,7 @@ public class MainManager : MonoBehaviour
     public Rigidbody Ball;
 
     //UI Elements
+    public Text highScoreText;
     public Text ScoreText;
     public GameObject GameOverText;
 
@@ -30,13 +31,26 @@ public class MainManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
+        //Force us to the main menu if we don't have a data manager
+        ActivateDataManager();
+        DataManager.instance.LoadHighScore();
+        DisplayHighScore();
+        InitializePlayingField();
+        AddPoint(0);
+    }
+    void DisplayHighScore()
+    {
+        string highScoreName = DataManager.instance.scoreObject.playerName;
+        string highScorePoints = DataManager.instance.scoreObject.finalScore;
+        highScoreText.text = $"High score from _{highScoreName}_ at {highScorePoints}";
+    }
+    void ActivateDataManager()
+    {
         //Force the game to the main menu if the manager is dead
         if (DataManager.instance == null)
         {
             SceneManager.LoadScene("menu");
         }
-        InitializePlayingField();
     }
     void InitializePlayingField()
     {
@@ -77,17 +91,25 @@ public class MainManager : MonoBehaviour
                 SceneManager.LoadScene("menu");
             }
         }
-        ScoreText.text = $"{playerName}'s Score:";
+        //ScoreText.text = $"{playerName}'s Score:";
     }
 
     void AddPoint(int point)
     {
         m_Points += point;
-        ScoreText.text = $"{playerName}'s Score:";
+        ScoreText.text = $"{playerName}'s Score: {m_Points}";
     }
 
     public void GameOver()
     {
+        int currentHighScore = 0;
+        currentHighScore = int.Parse(DataManager.instance.scoreObject.finalScore);
+        if (m_Points > currentHighScore)
+        {
+            DataManager.instance.playerScore = m_Points;
+            DataManager.instance.SaveHighScore();
+        }
+        DisplayHighScore();
         m_GameOver = true;
         GameOverText.SetActive(true);
     }
