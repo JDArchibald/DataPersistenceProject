@@ -3,29 +3,47 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
 
 public class MainManager : MonoBehaviour
 {
+    //Game objects
     public Brick BrickPrefab;
     public int LineCount = 6;
     public Rigidbody Ball;
 
+    //UI Elements
     public Text ScoreText;
     public GameObject GameOverText;
-    
+
+    //Pregame mechanics
     private bool m_Started = false;
+
+    //Score and name
     private int m_Points;
-    
+    private string playerName = DataManager.instance.playerName;
+
+    //Postgame mechanics
     private bool m_GameOver = false;
 
-    
+
     // Start is called before the first frame update
     void Start()
     {
+
+        //Force the game to the main menu if the manager is dead
+        if (DataManager.instance == null)
+        {
+            SceneManager.LoadScene("menu");
+        }
+        InitializePlayingField();
+    }
+    void InitializePlayingField()
+    {
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
-        
-        int[] pointCountArray = new [] {1,1,2,2,5,5};
+
+        int[] pointCountArray = new[] { 1, 1, 2, 2, 5, 5 };
         for (int i = 0; i < LineCount; ++i)
         {
             for (int x = 0; x < perLine; ++x)
@@ -37,7 +55,6 @@ public class MainManager : MonoBehaviour
             }
         }
     }
-
     private void Update()
     {
         if (!m_Started)
@@ -57,15 +74,16 @@ public class MainManager : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+                SceneManager.LoadScene("menu");
             }
         }
+        ScoreText.text = $"{playerName}'s Score:";
     }
 
     void AddPoint(int point)
     {
         m_Points += point;
-        ScoreText.text = $"Score : {m_Points}";
+        ScoreText.text = $"{playerName}'s Score:";
     }
 
     public void GameOver()
